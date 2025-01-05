@@ -4,12 +4,15 @@ export const AddEditProductStyles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    gap: 10,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+    marginTop: 100,
+    marginBottom: 100,
   },
   textInput: {
     height: 50,
@@ -33,6 +36,6 @@ export const AddEditProductStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    marginTop: 16,
+    marginTop: 80,
   },
 });

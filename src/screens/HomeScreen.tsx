@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, Alert} from 'react-native';
+import {View, Text, TouchableOpacity, Alert, Animated} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PieChart} from 'react-native-svg-charts';
 import {HomeScreenStyles as style} from '../styles/HomeScreenStyles';
@@ -16,6 +16,8 @@ const HomeScreen = ({navigation}: any) => {
   const styles = theme === 'dark' ? darkTheme : lightTheme;
   const [products, setProducts] = useState<Record<string, any[]>>({});
   const {formatAllCategories} = useShareableList();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuAnimation] = useState(new Animated.Value(0));
 
   const loadProducts = async () => {
     try {
@@ -29,7 +31,6 @@ const HomeScreen = ({navigation}: any) => {
       console.error('Error loading products:', error);
     }
   };
-
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', loadProducts);
@@ -73,6 +74,15 @@ const HomeScreen = ({navigation}: any) => {
       ],
       {cancelable: true},
     );
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+    Animated.timing(menuAnimation, {
+      toValue: menuOpen ? 0 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
   };
 
   const totalProducts = Object.values(products).reduce(
@@ -149,18 +159,49 @@ const HomeScreen = ({navigation}: any) => {
         onPress={() => navigation.navigate('AddEditProduct')}>
         <Icon name="plus" size={24} style={styles.text} />
       </TouchableOpacity>
-      <TouchableOpacity
+      <Animated.View
         style={[
-          style.resetButton,
-          {backgroundColor: styles.button.backgroundColor},
-        ]}
-        onPress={handleResetAll}>
-        <Icon name="trash-can" size={24} style={styles.text} />
-      </TouchableOpacity>
+          style.menuContainer,
+          {
+            opacity: menuAnimation,
+            transform: [
+              {
+                translateY: menuAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 560],
+                }),
+              },
+            ],
+          },
+        ]}>
+        <TouchableOpacity
+          style={[style.menuButton, {backgroundColor: styles.accent.color}]}
+          onPress={() => {
+            handleShare();
+            toggleMenu();
+          }}>
+          <Icon
+            name="share-variant"
+            size={24}
+            style={{color: styles.text.color}}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[style.menuButton, {backgroundColor: styles.accent.color}]}
+          onPress={handleResetAll}>
+          <Icon
+            name="trash-can-outline"
+            size={24}
+            style={{color: styles.text.color}}
+          />
+        </TouchableOpacity>
+      </Animated.View>
+
       <TouchableOpacity
-        style={[style.shareButton, {backgroundColor: styles.accent.color}]}
-        onPress={handleShare}>
-        <Icon name="share-variant" size={24} style={styles.text} />
+        style={[style.menuToggle, {backgroundColor: styles.accent.color}]}
+        onPress={toggleMenu}>
+        <Icon name="menu" size={24} style={{color: styles.text.color}} />
       </TouchableOpacity>
     </View>
   );

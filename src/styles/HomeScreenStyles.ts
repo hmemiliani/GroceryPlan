@@ -51,28 +51,32 @@ export const HomeScreenStyles = StyleSheet.create({
     borderRadius: 28,
     elevation: 5,
   },
-
-  resetButton: {
+  menuToggle: {
     position: 'absolute',
-    bottom: 16,
-    right: '47%',
     width: 56,
     height: 56,
+    bottom: 16,
+    left: 20,
+    padding: 12,
+    borderRadius: 50,
+    elevation: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 28,
-    elevation: 5,
   },
-
-  shareButton: {
+  
+  menuContainer: {
     position: 'absolute',
-    bottom: 16,
-    left: 16,
+    left: 20,
+    alignItems: 'center',
+  },
+  
+  menuButton: {
+    marginBottom: 10,
     width: 56,
     height: 56,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 28,
-    elevation: 5,
   },
+  
 });

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  Animated,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PieChart} from 'react-native-svg-charts';
@@ -25,6 +26,8 @@ const CategoryScreen = ({route, navigation}: any) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const {formatCategoryList} = useShareableList();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuAnimation] = useState(new Animated.Value(0));
 
   const loadProducts = async () => {
     try {
@@ -86,6 +89,15 @@ const CategoryScreen = ({route, navigation}: any) => {
       ],
       {cancelable: true},
     );
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+    Animated.timing(menuAnimation, {
+      toValue: menuOpen ? 0 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
   };
 
   const totalProducts = products.length;
@@ -188,19 +200,49 @@ const CategoryScreen = ({route, navigation}: any) => {
         <Icon name="plus" size={24} style={styles.text} />
       </TouchableOpacity>
 
-      <TouchableOpacity
+      <Animated.View
         style={[
-          style.resetButton,
-          {backgroundColor: styles.button.backgroundColor},
-        ]}
-        onPress={handleResetCategory}>
-        <Icon name="trash-can" size={24} style={styles.text} />
-      </TouchableOpacity>
+          style.menuContainer,
+          {
+            opacity: menuAnimation,
+            transform: [
+              {
+                translateY: menuAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 560],
+                }),
+              },
+            ],
+          },
+        ]}>
+        <TouchableOpacity
+          style={[style.menuButton, {backgroundColor: styles.accent.color}]}
+          onPress={() => {
+            handleShare();
+            toggleMenu();
+          }}>
+          <Icon
+            name="share-variant"
+            size={24}
+            style={{color: styles.text.color}}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[style.menuButton, {backgroundColor: styles.accent.color}]}
+          onPress={handleResetCategory}>
+          <Icon
+            name="trash-can-outline"
+            size={24}
+            style={{color: styles.text.color}}
+          />
+        </TouchableOpacity>
+      </Animated.View>
 
       <TouchableOpacity
-        style={[style.shareButton, {backgroundColor: styles.accent.color}]}
-        onPress={handleShare}>
-        <Icon name="share-variant" size={24} style={styles.text} />
+        style={[style.menuToggle, {backgroundColor: styles.accent.color}]}
+        onPress={toggleMenu}>
+        <Icon name="menu" size={24} style={{color: styles.text.color}} />
       </TouchableOpacity>
 
       {selectedProduct && (
