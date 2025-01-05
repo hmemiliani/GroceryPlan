@@ -1,11 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, TouchableOpacity, Modal} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Modal,
+  Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PieChart} from 'react-native-svg-charts';
 import {useTheme} from '../hooks/useTheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {darkTheme, lightTheme} from '../styles/GlobalStyles';
 import {CategoryScreenStyles as style} from '../styles/CategoryScreenStyles';
+import {useShareableList} from '../hooks/useShareableList';
+import Share from 'react-native-share';
 
 const CategoryScreen = ({route, navigation}: any) => {
   const {theme} = useTheme();
@@ -15,6 +24,7 @@ const CategoryScreen = ({route, navigation}: any) => {
   const [products, setProducts] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const {formatCategoryList} = useShareableList();
 
   const loadProducts = async () => {
     try {
@@ -31,6 +41,52 @@ const CategoryScreen = ({route, navigation}: any) => {
     loadProducts();
     return unsubscribe;
   }, [navigation]);
+
+  const handleShare = async () => {
+    const formattedList = formatCategoryList(category, products);
+    try {
+      await Share.open({
+        title: `Lista de Productos Pendientes - ${category}`,
+        message: formattedList,
+      });
+    } catch (error) {
+      if (error.message !== 'User did not share') {
+        Alert.alert('Error', 'No se pudo compartir la lista.');
+      }
+    }
+  };
+
+  const handleResetCategory = async () => {
+    Alert.alert(
+      'Vaciar Categoría',
+      `¿Estás seguro de que quieres vaciar la categoría "${category}"?`,
+      [
+        {text: 'Cancelar', style: 'cancel'},
+        {
+          text: 'Vaciar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const storedProducts = await AsyncStorage.getItem('products');
+              const allProducts = storedProducts
+                ? JSON.parse(storedProducts)
+                : {};
+              delete allProducts[category];
+              await AsyncStorage.setItem(
+                'products',
+                JSON.stringify(allProducts),
+              );
+              setProducts([]);
+            } catch (error) {
+              console.error('Error resetting category:', error);
+              Alert.alert('Error', 'No se pudo vaciar la categoría.');
+            }
+          },
+        },
+      ],
+      {cancelable: true},
+    );
+  };
 
   const totalProducts = products.length;
   const completedProducts = products.filter(
@@ -116,7 +172,7 @@ const CategoryScreen = ({route, navigation}: any) => {
             </Text>
             <Text
               style={[
-                style.productName,
+                style.productQuantity,
                 styles.text,
                 item.completed && {textDecorationLine: 'line-through'},
               ]}>
@@ -129,7 +185,22 @@ const CategoryScreen = ({route, navigation}: any) => {
       <TouchableOpacity
         style={[style.addButton, {backgroundColor: styles.accent.color}]}
         onPress={() => navigation.navigate('AddEditProduct', {category})}>
-        <Icon name="plus" size={24} style={{color: '#FFF'}} />
+        <Icon name="plus" size={24} style={styles.text} />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          style.resetButton,
+          {backgroundColor: styles.button.backgroundColor},
+        ]}
+        onPress={handleResetCategory}>
+        <Icon name="trash-can" size={24} style={styles.text} />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[style.shareButton, {backgroundColor: styles.accent.color}]}
+        onPress={handleShare}>
+        <Icon name="share-variant" size={24} style={styles.text} />
       </TouchableOpacity>
 
       {selectedProduct && (

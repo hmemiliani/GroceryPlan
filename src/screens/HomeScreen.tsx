@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PieChart} from 'react-native-svg-charts';
 import {HomeScreenStyles as style} from '../styles/HomeScreenStyles';
@@ -8,11 +8,14 @@ import ThemeToggle from '../components/ThemeToggle';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import categories from '../constants/categories';
 import {darkTheme, lightTheme} from '../styles/GlobalStyles';
+import {useShareableList} from '../hooks/useShareableList';
+import Share from 'react-native-share';
 
 const HomeScreen = ({navigation}: any) => {
   const {theme} = useTheme();
   const styles = theme === 'dark' ? darkTheme : lightTheme;
   const [products, setProducts] = useState<Record<string, any[]>>({});
+  const {formatAllCategories} = useShareableList();
 
   const loadProducts = async () => {
     try {
@@ -33,6 +36,44 @@ const HomeScreen = ({navigation}: any) => {
     loadProducts();
     return unsubscribe;
   }, [navigation]);
+
+  const handleShare = async () => {
+    const formattedList = formatAllCategories(products);
+    try {
+      await Share.open({
+        title: 'Lista de Productos Pendientes',
+        message: formattedList,
+      });
+    } catch (error) {
+      if (error.message !== 'User did not share') {
+        Alert.alert('Error', 'No se pudo compartir la lista.');
+      }
+    }
+  };
+
+  const handleResetAll = async () => {
+    Alert.alert(
+      'Vaciar Lista',
+      '¿Estás seguro de que quieres vaciar toda la lista de compras?',
+      [
+        {text: 'Cancelar', style: 'cancel'},
+        {
+          text: 'Vaciar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem('products');
+              setProducts({});
+            } catch (error) {
+              console.error('Error resetting list:', error);
+              Alert.alert('Error', 'No se pudo vaciar la lista.');
+            }
+          },
+        },
+      ],
+      {cancelable: true},
+    );
+  };
 
   const totalProducts = Object.values(products).reduce(
     (sum, categoryProducts) => sum + categoryProducts.length,
@@ -97,6 +138,7 @@ const HomeScreen = ({navigation}: any) => {
                 size={40}
                 style={[style.categoryIcon, styles.text]}
               />
+              <Text style={styles.text}>{category.name}</Text>
             </TouchableOpacity>
           );
         })}
@@ -105,7 +147,20 @@ const HomeScreen = ({navigation}: any) => {
       <TouchableOpacity
         style={[style.addButton, {backgroundColor: styles.accent.color}]}
         onPress={() => navigation.navigate('AddEditProduct')}>
-        <Icon name="plus" size={24} style={{color: '#FFF'}} />
+        <Icon name="plus" size={24} style={styles.text} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          style.resetButton,
+          {backgroundColor: styles.button.backgroundColor},
+        ]}
+        onPress={handleResetAll}>
+        <Icon name="trash-can" size={24} style={styles.text} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[style.shareButton, {backgroundColor: styles.accent.color}]}
+        onPress={handleShare}>
+        <Icon name="share-variant" size={24} style={styles.text} />
       </TouchableOpacity>
     </View>
   );
