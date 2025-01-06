@@ -10,7 +10,6 @@ export const useHome = (navigation: any) => {
   const [menuAnimation] = useState(new Animated.Value(0));
   const {formatAllCategories} = useShareableList();
 
-  // Load products from AsyncStorage
   const loadProducts = async () => {
     try {
       const storedProducts = await AsyncStorage.getItem('products');
@@ -30,7 +29,6 @@ export const useHome = (navigation: any) => {
     return unsubscribe;
   }, [navigation]);
 
-  // Share all categories
   const handleShare = async () => {
     const formattedList = formatAllCategories(products);
     try {
@@ -70,7 +68,6 @@ export const useHome = (navigation: any) => {
     );
   };
 
-  // Toggle menu animation
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
     Animated.timing(menuAnimation, {
@@ -80,7 +77,6 @@ export const useHome = (navigation: any) => {
     }).start();
   };
 
-  // Calculate progress for the pie chart
   const totalProducts = Object.values(products).reduce(
     (sum, categoryProducts) => sum + categoryProducts.length,
     0,

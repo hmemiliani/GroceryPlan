@@ -36,7 +36,6 @@ export const useAddEditProduct = ({
         allProducts[product?.category || selectedCategory] || [];
 
       if (product?.id) {
-        // Update existing product
         const updatedProducts = currentCategoryProducts.map((p: any) =>
           p.id === product.id
             ? {
@@ -49,7 +48,6 @@ export const useAddEditProduct = ({
         );
 
         if (product.category !== selectedCategory) {
-          // Move product to new category
           allProducts[product.category] = currentCategoryProducts.filter(
             (p: any) => p.id !== product.id,
           );
@@ -68,7 +66,6 @@ export const useAddEditProduct = ({
           allProducts[product.category] = updatedProducts;
         }
       } else {
-        // Add new product
         const newProduct = {
           id: Date.now().toString(),
           name,

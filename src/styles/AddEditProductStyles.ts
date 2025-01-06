@@ -9,7 +9,6 @@ export const AddEditProductStyles = StyleSheet.create({
   headerText: {
     fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 16,
     textAlign: 'center',
     marginTop: 100,
     marginBottom: 100,
