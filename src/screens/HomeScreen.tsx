@@ -93,9 +93,9 @@ const HomeScreen = ({navigation}: any) => {
             opacity: menuAnimation,
             transform: [
               {
-                translateY: menuAnimation.interpolate({
+                translateX: menuAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [50, 0],
+                  outputRange: [-100, 0],
                 }),
               },
             ],

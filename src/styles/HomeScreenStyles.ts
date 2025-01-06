@@ -67,9 +67,10 @@ export const HomeScreenStyles = StyleSheet.create({
   menuContainer: {
     position: 'absolute',
     left: 20,
-    bottom: 93,
+    bottom: 80,
     alignItems: 'center',
     zIndex: 10,
+    
   },
   
   menuButton: {

@@ -111,9 +111,9 @@ const CategoryScreen = ({route, navigation}: any) => {
             opacity: menuAnimation,
             transform: [
               {
-                translateY: menuAnimation.interpolate({
+                translateX: menuAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [0, 560],
+                  outputRange: [-100, 0],
                 }),
               },
             ],

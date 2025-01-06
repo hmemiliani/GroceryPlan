@@ -79,7 +79,10 @@ export const CategoryScreenStyles = StyleSheet.create({
   menuContainer: {
     position: 'absolute',
     left: 20,
+    bottom: 80,
     alignItems: 'center',
+    zIndex: 10,
+    
   },
 
   menuButton: {
