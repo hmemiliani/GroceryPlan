@@ -1,101 +1,27 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, Alert, Animated} from 'react-native';
+import React from 'react';
+import {View, Text, TouchableOpacity, Animated} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PieChart} from 'react-native-svg-charts';
 import {HomeScreenStyles as style} from '../styles/HomeScreenStyles';
 import {useTheme} from '../hooks/useTheme';
 import ThemeToggle from '../components/ThemeToggle';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import categories from '../constants/categories';
 import {darkTheme, lightTheme} from '../styles/GlobalStyles';
-import {useShareableList} from '../hooks/useShareableList';
-import Share from 'react-native-share';
+import categories from '../constants/categories';
+import {useHome} from '../hooks/useHome';
 
 const HomeScreen = ({navigation}: any) => {
   const {theme} = useTheme();
   const styles = theme === 'dark' ? darkTheme : lightTheme;
-  const [products, setProducts] = useState<Record<string, any[]>>({});
-  const {formatAllCategories} = useShareableList();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [menuAnimation] = useState(new Animated.Value(0));
 
-  const loadProducts = async () => {
-    try {
-      const storedProducts = await AsyncStorage.getItem('products');
-      if (storedProducts) {
-        setProducts(JSON.parse(storedProducts));
-      } else {
-        setProducts({});
-      }
-    } catch (error) {
-      console.error('Error loading products:', error);
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', loadProducts);
-    loadProducts();
-    return unsubscribe;
-  }, [navigation]);
-
-  const handleShare = async () => {
-    const formattedList = formatAllCategories(products);
-    try {
-      await Share.open({
-        title: 'Lista de Productos Pendientes',
-        message: formattedList,
-      });
-    } catch (error) {
-      if (error.message !== 'User did not share') {
-        Alert.alert('Error', 'No se pudo compartir la lista.');
-      }
-    }
-  };
-
-  const handleResetAll = async () => {
-    Alert.alert(
-      'Vaciar Lista',
-      '¿Estás seguro de que quieres vaciar toda la lista de compras?',
-      [
-        {text: 'Cancelar', style: 'cancel'},
-        {
-          text: 'Vaciar',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await AsyncStorage.removeItem('products');
-              setProducts({});
-            } catch (error) {
-              console.error('Error resetting list:', error);
-              Alert.alert('Error', 'No se pudo vaciar la lista.');
-            }
-          },
-        },
-      ],
-      {cancelable: true},
-    );
-  };
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-    Animated.timing(menuAnimation, {
-      toValue: menuOpen ? 0 : 1,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const totalProducts = Object.values(products).reduce(
-    (sum, categoryProducts) => sum + categoryProducts.length,
-    0,
-  );
-  const completedProducts = Object.values(products).reduce(
-    (sum, categoryProducts) =>
-      sum + categoryProducts.filter(product => product.completed).length,
-    0,
-  );
-  const progress =
-    totalProducts > 0 ? (completedProducts / totalProducts) * 100 : 0;
+  const {
+    products,
+    menuOpen,
+    menuAnimation,
+    progress,
+    handleShare,
+    handleResetAll,
+    toggleMenu,
+  } = useHome(navigation);
 
   const pieData =
     progress > 0
@@ -159,6 +85,7 @@ const HomeScreen = ({navigation}: any) => {
         onPress={() => navigation.navigate('AddEditProduct')}>
         <Icon name="plus" size={24} style={styles.text} />
       </TouchableOpacity>
+
       <Animated.View
         style={[
           style.menuContainer,
@@ -168,7 +95,7 @@ const HomeScreen = ({navigation}: any) => {
               {
                 translateY: menuAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [0, 560],
+                  outputRange: [50, 0],
                 }),
               },
             ],

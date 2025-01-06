@@ -1,111 +1,39 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   Modal,
-  Alert,
   Animated,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PieChart} from 'react-native-svg-charts';
 import {useTheme} from '../hooks/useTheme';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {darkTheme, lightTheme} from '../styles/GlobalStyles';
 import {CategoryScreenStyles as style} from '../styles/CategoryScreenStyles';
-import {useShareableList} from '../hooks/useShareableList';
-import Share from 'react-native-share';
+import {useCategory} from '../hooks/useCategory';
 
 const CategoryScreen = ({route, navigation}: any) => {
   const {theme} = useTheme();
   const styles = theme === 'dark' ? darkTheme : lightTheme;
   const {category} = route.params;
 
-  const [products, setProducts] = useState<any[]>([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const {formatCategoryList} = useShareableList();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [menuAnimation] = useState(new Animated.Value(0));
-
-  const loadProducts = async () => {
-    try {
-      const storedProducts = await AsyncStorage.getItem('products');
-      const allProducts = storedProducts ? JSON.parse(storedProducts) : {};
-      setProducts(allProducts[category] || []);
-    } catch (error) {
-      console.error('Error loading products:', error);
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', loadProducts);
-    loadProducts();
-    return unsubscribe;
-  }, [navigation]);
-
-  const handleShare = async () => {
-    const formattedList = formatCategoryList(category, products);
-    try {
-      await Share.open({
-        title: `Lista de Productos Pendientes - ${category}`,
-        message: formattedList,
-      });
-    } catch (error) {
-      if (error.message !== 'User did not share') {
-        Alert.alert('Error', 'No se pudo compartir la lista.');
-      }
-    }
-  };
-
-  const handleResetCategory = async () => {
-    Alert.alert(
-      'Vaciar Categoría',
-      `¿Estás seguro de que quieres vaciar la categoría "${category}"?`,
-      [
-        {text: 'Cancelar', style: 'cancel'},
-        {
-          text: 'Vaciar',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const storedProducts = await AsyncStorage.getItem('products');
-              const allProducts = storedProducts
-                ? JSON.parse(storedProducts)
-                : {};
-              delete allProducts[category];
-              await AsyncStorage.setItem(
-                'products',
-                JSON.stringify(allProducts),
-              );
-              setProducts([]);
-            } catch (error) {
-              console.error('Error resetting category:', error);
-              Alert.alert('Error', 'No se pudo vaciar la categoría.');
-            }
-          },
-        },
-      ],
-      {cancelable: true},
-    );
-  };
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-    Animated.timing(menuAnimation, {
-      toValue: menuOpen ? 0 : 1,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const totalProducts = products.length;
-  const completedProducts = products.filter(
-    product => product.completed,
-  ).length;
-  const progress =
-    totalProducts > 0 ? (completedProducts / totalProducts) * 100 : 0;
+  const {
+    products,
+    modalVisible,
+    setModalVisible,
+    selectedProduct,
+    setSelectedProduct,
+    menuOpen,
+    menuAnimation,
+    progress,
+    toggleMenu,
+    handleShare,
+    handleResetCategory,
+    toggleProductCompleted,
+    deleteProduct,
+  } = useCategory({category, navigation});
 
   const pieData =
     progress > 0
@@ -118,30 +46,6 @@ const CategoryScreen = ({route, navigation}: any) => {
           },
         ]
       : [{key: 1, value: 1, svg: {fill: styles.button.backgroundColor}}];
-
-  const toggleProductCompleted = async (index: number) => {
-    const updatedProducts = [...products];
-    updatedProducts[index].completed = !updatedProducts[index].completed;
-    setProducts(updatedProducts);
-
-    const storedProducts = await AsyncStorage.getItem('products');
-    const allProducts = storedProducts ? JSON.parse(storedProducts) : {};
-    allProducts[category] = updatedProducts;
-    await AsyncStorage.setItem('products', JSON.stringify(allProducts));
-  };
-
-  const deleteProduct = async () => {
-    const updatedProducts = products.filter(
-      product => product !== selectedProduct,
-    );
-    setProducts(updatedProducts);
-
-    const storedProducts = await AsyncStorage.getItem('products');
-    const allProducts = storedProducts ? JSON.parse(storedProducts) : {};
-    allProducts[category] = updatedProducts;
-    await AsyncStorage.setItem('products', JSON.stringify(allProducts));
-    setModalVisible(false);
-  };
 
   return (
     <View style={[styles.container, style.container]}>

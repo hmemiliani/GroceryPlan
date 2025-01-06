@@ -1,91 +1,26 @@
-import React, {useState} from 'react';
-import {View, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
+import React from 'react';
+import {View, Text, TextInput, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {useTheme} from '../hooks/useTheme';
 import {AddEditProductStyles as style} from '../styles/AddEditProductStyles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {darkTheme, lightTheme} from '../styles/GlobalStyles';
 import categories from '../constants/categories';
+import {useAddEditProduct} from '../hooks/useAddEditProduct';
 
 const AddEditProductScreen = ({route, navigation}: any) => {
   const {theme} = useTheme();
   const styles = theme === 'dark' ? darkTheme : lightTheme;
 
   const {product, category: initialCategory} = route.params || {};
-
-  const [name, setName] = useState(product?.name || '');
-  const [quantity, setQuantity] = useState(
-    product?.quantity !== undefined ? product.quantity.toString() : '1',
-  );
-  const [selectedCategory, setSelectedCategory] = useState(
-    product?.category || initialCategory || categories[0].name,
-  );
-
-  const saveProduct = async () => {
-    if (!name.trim()) {
-      Alert.alert('Error', 'El nombre del producto no puede estar vacío.');
-      return;
-    }
-
-    try {
-      const storedProducts = await AsyncStorage.getItem('products');
-      const allProducts = storedProducts ? JSON.parse(storedProducts) : {};
-
-      const currentCategoryProducts =
-        allProducts[product?.category || selectedCategory] || [];
-
-      if (product?.id) {
-        const updatedProducts = currentCategoryProducts.map(p =>
-          p.id === product.id
-            ? {
-                ...p,
-                name,
-                quantity: parseInt(quantity),
-                category: selectedCategory,
-              }
-            : p,
-        );
-
-        if (product.category !== selectedCategory) {
-          allProducts[product.category] = currentCategoryProducts.filter(
-            p => p.id !== product.id,
-          );
-
-          allProducts[selectedCategory] = [
-            ...(allProducts[selectedCategory] || []),
-            {
-              id: product.id,
-              name,
-              quantity: parseInt(quantity),
-              category: selectedCategory,
-              completed: product.completed || false,
-            },
-          ];
-        } else {
-          allProducts[product.category] = updatedProducts;
-        }
-      } else {
-        const newProduct = {
-          id: Date.now().toString(),
-          name,
-          quantity: parseInt(quantity),
-          category: selectedCategory,
-          completed: false,
-        };
-        allProducts[selectedCategory] = [
-          ...(allProducts[selectedCategory] || []),
-          newProduct,
-        ];
-      }
-
-      await AsyncStorage.setItem('products', JSON.stringify(allProducts));
-
-      navigation.goBack();
-    } catch (error) {
-      console.error('Error saving product:', error);
-      Alert.alert('Error', 'No se pudo guardar el producto.');
-    }
-  };
+  const {
+    name,
+    quantity,
+    selectedCategory,
+    setName,
+    setQuantity,
+    setSelectedCategory,
+    saveProduct,
+  } = useAddEditProduct({product, initialCategory, navigation});
 
   return (
     <View style={[styles.container, style.container]}>
