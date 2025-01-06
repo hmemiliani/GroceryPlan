@@ -1,79 +1,167 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-# Getting Started
+# 🛒 GroceryPlan - Your Ultimate Shopping Companion
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+**GroceryPlan** is a React Native application designed to help you organize and manage your shopping lists with ease. Specifically built for Android devices. 🚀
 
-## Step 1: Start the Metro Server
+---
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## 🌟 Features
 
-To start Metro, run the following command from the _root_ of your React Native project:
+- 📋 **Organized Lists**: Categorize your products efficiently.
+- 🔄 **Real-Time Updates**: Add, edit, and delete products effortlessly.
+- 📊 **Progress Tracking**: Visualize your progress with pie charts.
+- 📤 **Share Your List**: Easily share lists via WhatsApp, SMS, or other apps.
+- 🌙 **Dark and Light Modes**: Customize the app's appearance to suit your style.
 
-```bash
-# using npm
-npm start
+---
 
-# OR using Yarn
-yarn start
-```
+## 🛠️ Environment Setup
 
-## Step 2: Start your Application
+### 1️⃣ **Install Yarn**
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
+GroceryPlan uses **Yarn** for dependency management. Install it globally by running the following commands:
 
 ```bash
-# using npm
-npm run android
+# For Windows (using npm)
+npm install -g yarn
 
-# OR using Yarn
-yarn android
+# For macOS (using Homebrew)
+brew install yarn
 ```
 
-### For iOS
+Verify the installation:
 
 ```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+yarn --version
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+---
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+### 2️⃣ **Install Android Studio**
 
-## Step 3: Modifying your App
+GroceryPlan is designed for Android devices. Follow these steps to install and configure Android Studio:
 
-Now that you have successfully run the app, let's modify it.
+#### 👉 **Download and Install Android Studio**
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+1. Download Android Studio from the [official site](https://developer.android.com/studio).
+2. Complete the installation using the setup wizard.
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+#### 👉 **Configure Android Studio**
 
-## Congratulations! :tada:
+1. Open Android Studio and go to **SDK Manager**.
+2. Install the following SDK components:
+   - **Android SDK Platform** (latest version).
+   - **Android SDK Build Tools**.
+   - **Android Emulator**.
+   - **Command Line Tools**.
 
-You've successfully run and modified your React Native App. :partying_face:
+#### 👉 **Configure NDK**
 
-### Now what?
+1. Navigate to **SDK Manager** > **SDK Tools**.
+2. Select and install the **NDK (Native Development Kit)**.
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+#### 👉 **Set Up Environment Variables**
 
-# Troubleshooting
+For Windows:
+1. Locate your SDK path (e.g., `C:\Users\<YourUser>\AppData\Local\Android\Sdk`).
+2. Add this path to your system's environment variables (`PATH`).
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+---
 
-# Learn More
+### 3️⃣ **macOS Environment Setup**
 
-To learn more about React Native, take a look at the following resources:
+While GroceryPlan is Android-only, here’s how to prepare your macOS environment:
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+1. Install [Homebrew](https://brew.sh):
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. Install the required dependencies:
+   ```bash
+   brew install node watchman
+   ```
+
+3. Follow the Android Studio configuration steps mentioned above.
+
+---
+
+## 🚀 Running GroceryPlan
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/hmemiliani/GroceryPlan.git
+   cd GroceryPlan
+   ```
+
+2. **Install Dependencies**:
+   ```bash
+   yarn install
+   ```
+
+3. **Start Metro Bundler**:
+   ```bash
+   yarn start
+   ```
+
+4. **Run the Android App**:
+   ```bash
+   yarn android
+   ```
+
+---
+
+## 🛡️ Troubleshooting
+
+### ❌ **Missing SDK or NDK**
+
+Ensure all required components are installed in the **SDK Manager** of Android Studio.
+
+### ❌ **Emulator Not Starting**
+
+Manually launch the emulator from **AVD Manager** in Android Studio.
+
+### ❌ **Metro Bundler Not Connecting**
+
+1. Kill any running Metro processes:
+   ```bash
+   npx react-native kill-packager
+   ```
+
+2. Restart Metro:
+   ```bash
+   yarn start --reset-cache
+   ```
+
+---
+
+## 🌈 About the Project
+
+GroceryPlan is built with simplicity and usability in mind. It's perfect for everyday users and developers looking to explore the world of **React Native**.
+
+> **Note**: Currently, this application is optimized for Android only.
+
+---
+
+## 📚 Useful Resources
+
+- [React Native Documentation](https://reactnative.dev/docs/getting-started)
+- [Android Studio Setup](https://developer.android.com/studio)
+- [Yarn Documentation](https://classic.yarnpkg.com/en/docs)
+
+---
+
+## ❤️ Contributions
+
+Contributions are welcome! Feel free to fork this project and submit your pull requests. 🚀
+
+---
+
+### 🖼️ Preview
+
+![GroceryPlan Screenshot](https://res.cloudinary.com/djsxw9zeu/image/upload/v1736189445/n1jani9osfnupsnftdut.png)  
+_A sneak peek at GroceryPlan in action!_
+
+---
+
+Thank you for using GroceryPlan! ✨
